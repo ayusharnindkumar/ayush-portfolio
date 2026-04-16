@@ -1,7 +1,7 @@
-import { useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "./styles/Work.css";
 import WorkImage from "./WorkImage";
-import { MdArrowBack, MdArrowForward } from "react-icons/md";
+import { MdArrowBack, MdArrowForward, MdArrowOutward } from "react-icons/md";
 
 const projects = [
   {
@@ -62,9 +62,28 @@ const projects = [
   },
 ];
 
+const MOBILE_BREAKPOINT = 900;
+const hasLiveLink = (link?: string) => Boolean(link && link !== "#");
+
 const Work = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(
+    window.innerWidth <= MOBILE_BREAKPOINT
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth <= MOBILE_BREAKPOINT);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const goToSlide = useCallback(
     (index: number) => {
@@ -95,78 +114,139 @@ const Work = () => {
           My <span>Work</span>
         </h2>
 
-        <div className="carousel-wrapper">
-          {/* Navigation Arrows */}
-          <button
-            className="carousel-arrow carousel-arrow-left"
-            onClick={goToPrev}
-            aria-label="Previous project"
-            data-cursor="disable"
-          >
-            <MdArrowBack />
-          </button>
-          <button
-            className="carousel-arrow carousel-arrow-right"
-            onClick={goToNext}
-            aria-label="Next project"
-            data-cursor="disable"
-          >
-            <MdArrowForward />
-          </button>
-
-          {/* Slides */}
-          <div className="carousel-track-container">
-            <div
-              className="carousel-track"
-              style={{
-                transform: `translateX(-${currentIndex * 100}%)`,
-              }}
-            >
-              {projects.map((project, index) => (
-                <div className="carousel-slide" key={index}>
-                  <div className="carousel-content">
-                    <div className="carousel-info">
-                      <div className="carousel-number">
-                        <h3>0{index + 1}</h3>
-                      </div>
-                      <div className="carousel-details">
-                        <h4>{project.title}</h4>
-                        <p className="carousel-category">
-                          {project.category}
-                        </p>
-                        <div className="carousel-tools">
-                          <span className="tools-label">Tools & Features</span>
-                          <p>{project.tools}</p>
-                        </div>
-                      </div>
+        {isMobileView ? (
+          <div className="work-mobile-list">
+            {projects.map((project, index) => (
+              <article className="work-mobile-card" key={project.title}>
+                <div className="work-mobile-header">
+                  <span className="work-mobile-number">0{index + 1}</span>
+                  {hasLiveLink(project.link) && (
+                    <a
+                      href={project.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="work-mobile-link"
+                      data-cursor="disable"
+                    >
+                      Visit <MdArrowOutward />
+                    </a>
+                  )}
+                </div>
+                <div className="work-mobile-body">
+                  <div className="carousel-details">
+                    <h4>{project.title}</h4>
+                    <p className="carousel-category">{project.category}</p>
+                    <div className="carousel-tools">
+                      <span className="tools-label">Tools & Features</span>
+                      <p>{project.tools}</p>
                     </div>
-                    <div className="carousel-image-wrapper">
-                      <WorkImage
-                        image={project.image}
-                        alt={project.title}
-                        link={project.link}
-                      />
-                    </div>
+                    {hasLiveLink(project.link) && (
+                      <a
+                        href={project.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="project-visit-link"
+                        data-cursor="disable"
+                      >
+                        View Live Project <MdArrowOutward />
+                      </a>
+                    )}
+                  </div>
+                  <div className="carousel-image-wrapper">
+                    <WorkImage
+                      image={project.image}
+                      alt={project.title}
+                      link={project.link}
+                    />
                   </div>
                 </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="carousel-wrapper">
+            <button
+              className="carousel-arrow carousel-arrow-left"
+              onClick={goToPrev}
+              aria-label="Previous project"
+              data-cursor="disable"
+            >
+              <MdArrowBack />
+            </button>
+            <button
+              className="carousel-arrow carousel-arrow-right"
+              onClick={goToNext}
+              aria-label="Next project"
+              data-cursor="disable"
+            >
+              <MdArrowForward />
+            </button>
+
+            <div className="carousel-track-container">
+              <div
+                className="carousel-track"
+                style={{
+                  transform: `translateX(-${currentIndex * 100}%)`,
+                }}
+              >
+                {projects.map((project, index) => (
+                  <div className="carousel-slide" key={project.title}>
+                    <div className="carousel-content">
+                      <div className="carousel-info">
+                        <div className="carousel-number">
+                          <h3>0{index + 1}</h3>
+                        </div>
+                        <div className="carousel-details">
+                          <h4>{project.title}</h4>
+                          <p className="carousel-category">
+                            {project.category}
+                          </p>
+                          <div className="carousel-tools">
+                            <span className="tools-label">
+                              Tools & Features
+                            </span>
+                            <p>{project.tools}</p>
+                          </div>
+                          {hasLiveLink(project.link) && (
+                            <a
+                              href={project.link}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="project-visit-link"
+                              data-cursor="disable"
+                            >
+                              View Live Project <MdArrowOutward />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                      <div className="carousel-image-wrapper">
+                        <WorkImage
+                          image={project.image}
+                          alt={project.title}
+                          link={project.link}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="carousel-dots">
+              {projects.map((project, index) => (
+                <button
+                  key={project.title}
+                  className={`carousel-dot ${index === currentIndex ? "carousel-dot-active" : ""
+                    }`}
+                  onClick={() => goToSlide(index)}
+                  aria-label={`Go to project ${index + 1}`}
+                  data-cursor="disable"
+                />
               ))}
             </div>
           </div>
-
-          {/* Dot Indicators */}
-          <div className="carousel-dots">
-            {projects.map((_, index) => (
-              <button
-                key={index}
-                className={`carousel-dot ${index === currentIndex ? "carousel-dot-active" : ""
-                  }`}
-                onClick={() => goToSlide(index)}
-                aria-label={`Go to project ${index + 1}`}
-                data-cursor="disable"
-              />
-            ))}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
