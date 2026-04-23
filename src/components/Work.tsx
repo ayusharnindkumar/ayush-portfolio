@@ -58,7 +58,7 @@ const projects = [
     category: "Business Website",
     tools: "React.js",
     image: "/images/v3.png",
-    link: "https://v3softech-website.vercel.app",
+    link: "https://v3softech.in",
   },
 ];
 
